@@ -43,7 +43,6 @@ fixi takes advantage of some modern JavaScript features not used by htmx:
 
 * [`async` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
 * the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-* the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when new content is added
 * The [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) (used by htmx, but the sole mechanism for transitions in fixi)
 
 A hard constraint on the project is that the _unminified_, _uncompressed_ size must be less than that of
@@ -174,7 +173,8 @@ three components of fixi are:
 
 The main entry point is found at the bottom of [fixi.js](fixi.js): on the `DOMContentLoaded` event fixi does two things:
 
-* It establishes a MutationObserver to watch for newly added content with fixi-powered elements
+* It establishes a listener on the document to process any elements that have an [`fx:process`](#fxprocess) event 
+  triggered on them
 * It processes any existing fixi-powered elements
 
 fixi-powered elements are elements with the `fx-action` attribute on them.
@@ -342,7 +342,7 @@ triggered on elements have been initialized by fixi (does <b>not</b> bubble)
 <a href="#fxprocess"><code>fx:process</code></a>
 </td>
 <td>
-triggered on new content added to the DOM that is not filtered via the <code>fx-ignore</code> attribute
+fixi will listen for this event on the `document` and process fixi content found on or within the element
 </td>
 </tr>
 <tr>
@@ -418,10 +418,18 @@ Unlike other fixi events, this event does not bubble.
 
 ##### `fx:process`
 
-The `fx:process` event is triggered when fixi is sees new content added to the DOM that is not marked as `fx-ignore` or
-the child of a node marked as `fx-ignore`. 
+In contrast with other events, fixi _listens_ for the `fx:process` event on the `document`.  When it receives one of
+these events it will process the element, initializing any fixi-powered content on or within it.
 
-If it is cancelled via `preventDefault()`, neither the element nor any of its children will not be initialized by fixi.
+Here is an example of some fresh content that needs to be processed:
+
+```js
+let button = document.createElement('button')
+button.setAttribute("fx-action", "/demo")
+button.innerText = "Demo"
+document.body.appendChild(button)
+button.dispatchEvent(new CustomEvent("fx:process"), {bubbles:true}) // make sure you let it bubble to the document
+```
 
 #### Fetch Events
 

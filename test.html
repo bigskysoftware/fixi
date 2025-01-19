@@ -173,6 +173,7 @@
             <script>
               test(async ()=>{
                 currentTest.testElt.insertAdjacentHTML('beforeEnd', `<button fx-action="/demo">Button 1</button>`)
+                find('button').dispatchEvent(new CustomEvent("fx:process", {bubbles:true}))
                 await sleep(50);
                 mock("/demo", "<div>Foo</div>");
                 find('button').click();

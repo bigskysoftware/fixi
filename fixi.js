@@ -44,20 +44,22 @@
         send(elt, "finally", {evt, cfg})
       }
       let doSwap = ()=>{
+        cfg.parent = cfg.target.parentElement
         if (cfg.swap instanceof Function){
-          return cfg.swap(cfg.target, cfg.text)
+          return cfg.swap(cfg)
         } else if (cfg.swap === "outerHTML" || cfg.swap === "innerHTML"){
           cfg.target[cfg.swap] = cfg.text
         } else {
           cfg.target.insertAdjacentHTML(cfg.swap, cfg.text)
         }
+        process(cfg.parent)
       }
       if (cfg.transition && document.startViewTransition){
         await document.startViewTransition(doSwap).finished
       } else {
         await doSwap()
       }
-      send(elt, "swapped")
+      send(elt, "swapped", {cfg})
     }
     elt.__fixi.evt = attr(elt, "fx-trigger", elt.matches("form") ? "submit" : elt.matches("input,select,textarea") ? "change" : "click")
     elt.addEventListener(elt.__fixi.evt, elt.__fixi, options)
@@ -65,14 +67,12 @@
   }
   let process = (elt)=>{
     if (elt instanceof Element){
-      if (ignore(elt) || !send(elt, "fx:process")) return
       if (elt.matches("[fx-action]")) init(elt)
       elt.querySelectorAll("[fx-action]").forEach((elt)=>init(elt))
     }
   }
   document.addEventListener("DOMContentLoaded", ()=>{
-    let observer = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
-    observer.observe(document.body, {childList:true, subtree:true})
+    document.addEventListener("fx:process", (evt)=>process(evt.target))
     process(document.body)
   })
 })()
