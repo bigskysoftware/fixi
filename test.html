@@ -871,6 +871,40 @@
             </script>
         </div>
 
+        <div class="test">
+            <h3>Test inherit fx-swap="innerHTML"</h3>
+            <script>
+                test(async ()=>{
+                    mock("/demo", "Foo");
+                    find('button').click();
+                    await sleep(50);
+                    assertEq(find('button')?.innerText, "Foo", true);
+                })
+            </script>
+            <ul fx-swap="innerHTML">
+                <button fx-action="/demo">
+                    Button 1
+                </button>
+            </ul>
+        </div>
+
+        <div class="test">
+            <h3>Test inherit fx-target has "this"</h3>
+            <script>
+                test(async ()=>{
+                    mock("/demo", "<div>Foo</div>");
+                    find('button').click();
+                    await sleep(50);
+                    assertEq(find('ul'), null);
+                })
+            </script>
+            <ul fx-target>
+                <button fx-action="/demo">
+                    Button 1
+                </button>
+            </ul>
+        </div>
+
     </section>
 
 </main>
