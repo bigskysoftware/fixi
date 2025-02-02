@@ -1,7 +1,7 @@
 (()=>{
 	let send = (elt, type, detail, bub)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail, cancelable:true, bubbles:bub !== false, composed:true}))
 	let attr = (elt, name, defaultVal)=>elt.getAttribute(name) || defaultVal
-	let ignore = (elt)=>elt.matches("[fx-ignore]") || elt.closest("[fx-ignore]") != null
+	let ignore = (elt)=>elt.closest("[fx-ignore]") != null
 	let init = (elt)=>{
 		let options = {}
 		if (elt.__fixi || ignore(elt) || !send(elt, "init", {options})) return
