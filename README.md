@@ -691,7 +691,7 @@ The htmx [click to edit example](https://htmx.org/examples/click-to-edit/) can b
 
 ### Delete Row
 
-The [delete row example]() from htmx can be implemented in fixi like so:
+The [delete row example](https://htmx.org/examples/delete-row/) from htmx can be implemented in fixi like so:
 
 ```html
 <tr id="row-1">
