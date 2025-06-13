@@ -905,7 +905,7 @@ document.addEventListener('fx:config', (evt)=>{
     if (target.indexOf("closest ") == 0){
         evt.detail.cfg.target = evt.target.closest(target.substring(8))
     } else if (target.indexOf("find ") == 0){
-        evt.detail.cfg.target = evt.target.closest(target.substring(5))
+        evt.detail.cfg.target = evt.target.querySelector(target.substring(5))
     } else if (target.indexOf("next ") == 0){
         var matches = Array.from(document.querySelectorAll(target.substring(5)))
         evt.detail.cfg.target = matches.find((elt) => evt.target.compareDocumentPosition(elt) === Node.DOCUMENT_POSITION_FOLLOWING)
