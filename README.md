@@ -876,7 +876,7 @@ document.addEventListener("fx:init", (evt)=>{
 
 ### Server Sent Events
 
-datastar-style SSE can be implmented in the following manner:
+datastar-style SSE can be implemented in the following manner:
 
 ```js
 const evtSource = new EventSource("/sse");
@@ -906,7 +906,7 @@ evtSource.addEventListener("fixi", (event) => {
 
 #### Example Event
 
-On the server side, a fixi event type can be send with a stringified object containing target, swap, and text.
+On the server side, a fixi event type can be sent with a stringified object containing target, swap, and text.
 
 ```
 event: fixi
