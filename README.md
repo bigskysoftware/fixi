@@ -328,7 +328,21 @@ document.addEventListener("fx:config", (evt) => {
     }
 })
 ```
-However, this simple approach may fail if you have scripts that, for example, create global variables with `let`, etc.
+
+For inline scripts where [Locality of Behavior](https://htmx.org/essays/locality-of-behaviour) is desired. 
+The target scripts need to be replaced in order to execute.  
+
+This will automatically execute all script tags that are swapped in:
+
+```js
+document.addEventListener('fx:swapped', (evt) => {
+    evt.detail.cfg.target.querySelectorAll('script').forEach(s =>
+        s.replaceWith(Object.assign(document.createElement('script'),{textContent:s.textContent}))
+    )
+})
+```
+
+However, these simple approaches may fail if you have scripts that, for example, create global variables with `let`, etc.
 
 For this reason we broadly recommend loading all your scripts up front or simply using anchor tags for full page 
 navigations, unless you want to get into the weeds of dealing with these issues.
