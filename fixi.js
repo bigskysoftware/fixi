@@ -11,7 +11,7 @@
 			let reqs = elt.__fixi.requests ||= new Set()
 			let form = elt.form || elt.closest("form")
 			let body = new FormData(form ?? undefined, evt.submitter)
-			if (!form && elt.name) body.append(elt.name, elt.value)
+			if (elt.name && elt.hasAttribute("value")) body.append(elt.name, elt.value)
 			let ac = new AbortController()
 			let cfg = {
 				trigger:evt,
