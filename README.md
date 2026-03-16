@@ -1105,7 +1105,8 @@ With this extension, you can write code like this:
 ```html
 <a href="/example.html"
    fx-action="/example.html"
-   fx-target="html">
+   fx-target="html"
+   ext-fx-push>
     Example Fixi-Powered Link
 </a>
 ```
