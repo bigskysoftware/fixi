@@ -10,8 +10,8 @@
 		elt.__fixi = async(evt)=>{
 			let reqs = elt.__fixi.requests ||= new Set()
 			let form = elt.form || elt.closest("form")
-			let body = new FormData(form ?? undefined, evt.submitter ?? (form && form === elt.form && elt?.matches('input,button') && elt.type === "submit" ? elt : undefined))
-			if (!form && elt.name) body.append(elt.name, elt.value)
+			let body = new FormData(form ?? undefined, evt.submitter)
+			if (elt.name && !evt.submitter && (!form || (elt.form === form && elt.type === 'submit'))) body.append(elt.name, elt.value)
 			let ac = new AbortController()
 			let cfg = {
 				trigger:evt,
