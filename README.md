@@ -85,7 +85,7 @@ The fixi project consists of four files:
 fixi is designed to be easily [vendored](https://htmx.org/essays/vendoring/), that is, copied, into your project:
 
 ```bash
-curl https://raw.githubusercontent.com/bigskysoftware/fixi/refs/tags/0.9.2/fixi.js >> fixi-0.9.3.js
+curl https://raw.githubusercontent.com/bigskysoftware/fixi/refs/tags/0.9.3/fixi.js >> fixi-0.9.3.js
 ```
 
 The SHA256 of v0.9.3 is 
