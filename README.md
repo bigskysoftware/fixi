@@ -738,6 +738,28 @@ The htmx [lazy loading](https://htmx.org/examples/lazy-load/) example can be por
 </div>
 ```
 
+## Cross-Origin Requests
+
+fixi uses the browser's [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) defaults, which
+allow cross-origin requests. This means `fx-action` can point to any URL, including external domains.
+
+If you want to restrict requests to same-origin only, you can set `mode: "same-origin"` on the config object via
+the `fx:config` event:
+
+```js
+document.addEventListener("fx:config", (evt)=>{
+    evt.detail.cfg.mode = "same-origin"
+})
+```
+
+You can also enforce this at the browser level with the
+[`Content-Security-Policy: connect-src`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src)
+HTTP header, which restricts all `fetch()` (and XHR, WebSocket, etc.) connections to the specified origins:
+
+```http
+Content-Security-Policy: connect-src 'self'
+```
+
 ## Extensions
 
 Because fixi is minimalistic the user is responsible for implementing many behaviors they want via events. We have
