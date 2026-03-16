@@ -70,11 +70,12 @@ Like a fixed-gear bike, fixi has very few moving parts:
 * No `package.json`
 * No build step
 
-The fixi project consists of three files:
+The fixi project consists of four files:
 
 * [`fixi.js`](fixi.js), the code for the library
 * [`test.html`](test.html), the test suite for the library
 * This [`README.md`](README.md), which is the documentation
+* [`npm.sh`](npm.sh), which generates npm releases of the library
 
 [`test.html`](test.html) is a stand-alone HTML file that implements its own visual testing infrastructure, mocking for 
 `fetch()`, etc. and that can be opened using the `file:` protocol for easy testing.
