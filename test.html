@@ -655,6 +655,51 @@
             </form>
         </div>
 
+        <div class="test">
+            <h3>Test button name/value included in form data when triggered via click</h3>
+            <script>
+                test(async ()=>{
+                    mock(/.*/, (action, init)=>`<div>Foo</div>`);
+                    let body = null;
+                    find("button").addEventListener("fx:before", (evt)=>{
+                        body = evt.detail.cfg.body;
+                    })
+                    find('button').click();
+                    await sleep(50);
+                    assertEq(body.has('hidName'), true);
+                    assertEq(body.get('hidName'), 'hidVal');
+                    assertEq(body.has('butName'), true);
+                    assertEq(body.get('butName'), 'butVal');
+                })
+            </script>
+            <form>
+                <input type="hidden" name="hidName" value="hidVal">
+                <button fx-action="/demo" fx-method="post" name="butName" value="butVal">
+                    Click here
+                </button>
+            </form>
+        </div>
+
+        <div class="test">
+            <h3>Test non-button input in form is not double-included in form data</h3>
+            <script>
+                test(async ()=>{
+                    mock(/.*/, (action, init)=>`<div>Foo</div>`);
+                    let body = null;
+                    find("input[name=foo]").addEventListener("fx:before", (evt)=>{
+                        body = evt.detail.cfg.body;
+                    })
+                    find('input[name=foo]').dispatchEvent(new Event('change', {bubbles: true}));
+                    await sleep(50);
+                    assertEq(body.getAll('foo').length, 1);
+                    assertEq(body.get('foo'), 'bar');
+                })
+            </script>
+            <form>
+                <input type="text" name="foo" value="bar" fx-action="/demo" fx-method="post" fx-trigger="change">
+            </form>
+        </div>
+
     </section>
 
     <section id="web-components">
