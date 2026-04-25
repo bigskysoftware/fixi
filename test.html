@@ -989,6 +989,114 @@
             </div>
         </div>
 
+        <div class="test">
+            <h3>window.fixiCfg.swap overrides the default swap (when fx-swap absent)</h3>
+            <script>
+              test(async ()=>{
+                window.fixiCfg = {swap: "innerHTML"}
+                mock("/demo", "<span>x</span>")
+                let target = find('#fc1')
+                find('button').click()
+                await sleep(20)
+                // innerHTML swap leaves the button intact and replaces #fc1's children
+                assertEq(target.innerHTML, "<span>x</span>")
+                delete window.fixiCfg
+              })
+            </script>
+            <div id="fc1">
+                <button fx-action="/demo" fx-target="#fc1">go</button>
+            </div>
+        </div>
+
+        <div class="test">
+            <h3>fx-swap on the element still wins over window.fixiCfg.swap</h3>
+            <script>
+              test(async ()=>{
+                window.fixiCfg = {swap: "innerHTML"}
+                mock("/demo", "<i>y</i>")
+                let target = find('#fc2')
+                target.innerHTML = "start"
+                find('button').click()
+                await sleep(20)
+                // fx-swap="beforeend" on the element wins over innerHTML default
+                assertEq(target.innerHTML, "start<i>y</i>")
+                delete window.fixiCfg
+              })
+            </script>
+            <button fx-action="/demo" fx-target="#fc2" fx-swap="beforeend">go</button>
+            <div id="fc2"></div>
+        </div>
+
+        <div class="test">
+            <h3>window.fixiCfg.headers merge with FX-Request and reach the request</h3>
+            <script>
+              test(async ()=>{
+                window.fixiCfg = {headers: {"X-Extra": "abc"}}
+                let seen = null
+                find('button').addEventListener('fx:before', (e)=>{ seen = {...e.detail.cfg.headers} })
+                mock("/demo", "ok")
+                find('button').click()
+                await sleep(20)
+                assertEq(seen["FX-Request"], "true")
+                assertEq(seen["X-Extra"], "abc")
+                delete window.fixiCfg
+              })
+            </script>
+            <div id="fc3"><button fx-action="/demo" fx-target="#fc3">go</button></div>
+        </div>
+
+        <div class="test">
+            <h3>window.fixiCfg.headers can override built-in defaults like FX-Request</h3>
+            <script>
+              test(async ()=>{
+                window.fixiCfg = {headers: {"FX-Request": "no"}}
+                let seen = null
+                find('button').addEventListener('fx:before', (e)=>{ seen = e.detail.cfg.headers["FX-Request"] })
+                mock("/demo", "ok")
+                find('button').click()
+                await sleep(20)
+                assertEq(seen, "no")
+                delete window.fixiCfg
+              })
+            </script>
+            <div id="fc4"><button fx-action="/demo" fx-target="#fc4">go</button></div>
+        </div>
+
+        <div class="test">
+            <h3>window.fixiCfg.transition = false disables view transitions</h3>
+            <script>
+              test(async ()=>{
+                window.fixiCfg = {transition: false}
+                let seen
+                find('button').addEventListener('fx:before', (e)=>{ seen = e.detail.cfg.transition })
+                mock("/demo", "ok")
+                find('button').click()
+                await sleep(20)
+                // Critical: `??` (not `||`) preserves the explicit `false`
+                assertEq(seen, false)
+                delete window.fixiCfg
+              })
+            </script>
+            <div id="fc5"><button fx-action="/demo" fx-target="#fc5">go</button></div>
+        </div>
+
+        <div class="test">
+            <h3>window.fixiCfg.transition can supply a custom wrapper</h3>
+            <script>
+              test(async ()=>{
+                let calls = 0
+                window.fixiCfg = {transition: (fn)=>{ calls++; fn(); return {finished: Promise.resolve()} }}
+                mock("/demo", "<i>z</i>")
+                find('button').click()
+                await sleep(30)
+                assertEq(calls, 1)
+                assertEq(find('#fc6').innerHTML.includes("z"), true)
+                delete window.fixiCfg
+              })
+            </script>
+            <div id="fc6"><button fx-action="/demo" fx-target="#fc6" fx-swap="innerHTML">go</button></div>
+        </div>
+
     </section>
 
 </main>

@@ -4,6 +4,8 @@
 [fixi.js](https://swag.htmx.org/products/fixi-js-tee) is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
 
+fixi.js is the flagship library of the [fixi project](https://fixiproject.org), a family of minimalist companion libraries.
+
 The fixi [api](#api) consists of six [HTML attributes](#attributes), nine [events](#events) & two [properties](#properties)
 
 Here is an example:
@@ -661,6 +663,52 @@ elt.dispatchEvent(new CustomEvent("fx:process"), {bubbles:true})
 
 You can also use this property to store extension-related information.  See the [polling example](#polling) below.
 
+### Defaults via `window.fixiCfg`
+
+You can change a few of fixi's per-request defaults by assigning a global `fixiCfg` object.
+
+```html
+<script>
+    var fixiCfg = {
+        swap: "morph",
+        transition: false,
+        headers: {"X-CSRF-Token": "abc123"},
+    }
+</script>
+<script src="fixi.js"></script>
+```
+
+<table>
+<thead>
+<tr><th>key</th><th>effect</th></tr>
+</thead>
+<tbody>
+<tr>
+<td><code>swap</code></td>
+<td>
+Default value for <code>cfg.swap</code> when an element has no <code>fx-swap</code> attribute
+</td>
+</tr>
+<tr>
+<td><code>transition</code></td>
+<td>
+Replaces the default <code>document.startViewTransition</code> binding.  Set to <code>false</code>
+to disable view transitions entirely.  Set to a function with the same shape as
+<code>startViewTransition</code> to plug in a custom wrapper.
+</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td>
+Merged into the default <code>{"FX-Request": "true"}</code> headers; user-supplied keys win on
+collision.
+</td>
+</tr>
+</tbody>
+</table>
+
+Note that any [`fx:config`](#fxconfig) listener can override these defaults by mutating `evt.detail.cfg`, so per-element behavior is unaffected.
+
 ## Mocking
 
 It is easy to mock `fetch()` requests in fixi by replacing the `evt.detail.cfg.fetch` property with a mocking function.
@@ -916,43 +964,35 @@ document.addEventListener("fx:init", (evt)=>{
 
 ### Server Sent Events
 
-[SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)-based swaps can be implemented in the following manner:
+For [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)-based swaps,
+reach for [ssexi.js](https://github.com/bigskysoftware/ssexi), the fixi-project SSE companion.
+It hooks into fixi's `fx:config` event and streams responses with
+`Content-Type: text/event-stream` directly into the target as each message arrives:
 
-```js
-const evtSource = new EventSource("/sse");
-evtSource.addEventListener("fixi", (event) => {
-  const { target, swap, text } = JSON.parse(event.data);
-  document.querySelectorAll(target).forEach(async (ele) => {
-    if (ele) {
-      const cfg = {
-        target: ele,
-	swap: swap,
-	text: text,
-	transition: document.startViewTransition?.bind(document),
-      };
-      let doSwap = () => {
-        if (/(before|after)(begin|end)/.test(cfg.swap))
-	  cfg.target.insertAdjacentHTML(cfg.swap, cfg.text);
-	else if (cfg.swap in cfg.target)
-	  cfg.target[cfg.swap] = cfg.text;
-	else throw cfg.swap;
-      };
-      if (cfg.transition) await cfg.transition(doSwap).finished;
-      else await doSwap();
-    }
-  });
-});
+```html
+<script src="fixi.js"></script>
+<script src="ssexi.js"></script>
+
+<button fx-action="/stream" fx-swap="beforeend" fx-target="#log">Start</button>
+<div id="log"></div>
 ```
 
-#### Example Event
-
-On the server side, a fixi event type can be sent with a stringified object containing target, swap, and text.
+On the server, a message is any SSE `data:` frame containing HTML:
 
 ```
-event: fixi
-data: {"target":"#clock","swap":"innerHTML","text":"Mon Jun 30 2025 14:23:58 GMT-0400 (Eastern Daylight Time)"}
+data: <p>First update</p>
+
+data: <p>Second update</p>
 
 ```
+
+ssexi also supports named events, JSON-targeted events, `cfg.sseReconnect` for automatic
+reconnection with `Last-Event-ID`, and `cfg.ssePauseOnHidden` to pause when the tab is
+hidden. See the [ssexi README](https://github.com/bigskysoftware/ssexi) for details.
+
+If you'd rather roll your own, fixi's `fx:config` event gives you all the hooks you need;
+the [ssexi source](https://github.com/bigskysoftware/ssexi/blob/main/ssexi.js) is a short
+reference implementation.
 
 ### Confirmation
 
@@ -1047,10 +1087,22 @@ example:
 
 ### Custom Swapping Algorithms
 
-You can implement a custom swap strategies using the [`fx:config`](#fxconfig) event, and wiring in a function for the
-`evt.detail.cfg.swap` property.  Here is an example that allows you to use 
-[Idiomorph](https://github.com/bigskysoftware/idiomorph), a morphing algorithm, with the `morph` & `innerMorph` values
-in `fx-swap`:
+For DOM morphing specifically, the fixi-project ships
+[paxi.js](https://github.com/bigskysoftware/paxi), which registers itself as the `morph`
+swap strategy for you:
+
+```html
+<script src="fixi.js"></script>
+<script src="paxi.js"></script>
+
+<button fx-action="/demo" fx-swap="morph" fx-target="#output">Morph New Content</button>
+<output id="output"></output>
+```
+
+More generally, you can implement any custom swap strategy using the
+[`fx:config`](#fxconfig) event, wiring a function into `evt.detail.cfg.swap`. Here is an
+example that wires in [Idiomorph](https://github.com/bigskysoftware/idiomorph) for the
+`morph` & `innerMorph` values (paxi does something similar in a smaller package):
 
 ```js
 // fixi morphing extension
@@ -1066,13 +1118,6 @@ document.addEventListener("fx:config", (evt) => {
   if (evt.detail.cfg.swap == "innerMorph")
     evt.detail.cfg.swap = (cfg) => morph(cfg, "innerHTML");
 });
-```
-```html
-<h3>Morph</h3>
-<button fx-action="/demo" fx-swap="morph" fx-target="#output">
-  Morph New Content
-</button>
-<output id="output"></output>
 ```
 
 ### Implementing Attribute Inheritance
@@ -1148,9 +1193,9 @@ Zero-Clause BSD
 Permission to use, copy, modify, and/or distribute this software for
 any purpose with or without fee is hereby granted.
 
-THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
 WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
-OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLEs
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
 FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
 DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
 AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT

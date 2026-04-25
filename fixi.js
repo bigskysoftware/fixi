@@ -3,6 +3,7 @@
 	document.__fixi_mo = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
 	let send = (elt, type, detail, bub)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail, cancelable:true, bubbles:bub !== false, composed:true}))
 	let attr = (elt, name, defaultVal)=>elt.getAttribute(name) || defaultVal
+	let dflt = (n, d)=>(window.fixiCfg ?? {})[n] ?? d
 	let ignore = (elt)=>elt.closest("[fx-ignore]") != null
 	let init = (elt)=>{
 		let options = {}
@@ -18,14 +19,14 @@
 				action:attr(elt, "fx-action"),
 				method:attr(elt, "fx-method", "GET").toUpperCase(),
 				target:document.querySelector(attr(elt, "fx-target")) ?? elt,
-				swap:attr(elt, "fx-swap", "outerHTML"),
+				swap:attr(elt, "fx-swap", dflt("swap", "outerHTML")),
 				body,
 				drop:reqs.size,
-				headers:{"FX-Request":"true"},
+				headers:{"FX-Request":"true", ...window.fixiCfg?.headers},
 				abort:ac.abort.bind(ac),
 				signal:ac.signal,
 				preventTrigger:true,
-				transition:document.startViewTransition?.bind(document),
+				transition:dflt("transition", document.startViewTransition?.bind(document)),
 				fetch:fetch.bind(window)
 			}
 			let go = send(elt, "config", {cfg, requests:reqs})
