@@ -72,7 +72,7 @@ Like a fixed-gear bike, fixi has very few moving parts:
 * No `package.json`
 * No build step
 
-The fixi project consists of four files:
+This repo consists of four files:
 
 * [`fixi.js`](fixi.js), the code for the library
 * [`test.html`](test.html), the test suite for the library
