@@ -124,53 +124,14 @@ You can get support for fixi via:
 
 ### Attributes
 
-<table>
-<thead>
-<tr>
-  <th>attribute</th>
-  <th>description</th>
-  <th>example</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td>
-    <code>fx-action</code>
-  </td>
-  <td>
-    The URL to which an HTTP request will be issued, required
-  </td>
-  <td>
-    <code>fx-action='/demo'</code>
-  </td>
-</tr>
-<tr>
-<td><code>fx-method</code></td>
-<td>The HTTP Method that will be used for the request (case-insensitive), defaults to <code>GET</code></td>
-<td><code>fx-method=&#39;DELETE&#39;</code></td>
-</tr>
-<tr>
-<td><code>fx-target</code></td>
-<td>A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element</td>
-<td><code>fx-target=&#39;#a-div&#39;</code></td>
-</tr>
-<tr>
-<td><code>fx-swap</code></td>
-<td>A string specifying how the content should be swapped into the DOM, can be one of <code>innerHTML</code>, <code>outerHTML</code>, <code>beforebegin</code>, <code>afterbegin</code>, <code>beforeend</code>, <code>afterend</code>, <code>none</code>, or any valid property on the element (e.g. `className` or `value`), defaults to  <code>outerHTML</code></td>
-<td><code>fx-swap=&#39;innerHTML&#39;</code></td>
-</tr>
-<tr>
-<td><code>fx-trigger</code></td>
-<td>The event that will trigger a request, defaults to <code>submit</code> for <code>form</code> elements, <code>change</code> for <code>input</code>-like elements & <code>click</code> for all other elements</td>
-<td><code>fx-trigger=&#39;click&#39;</code></td>
-</tr>
-<tr>
-<td><code>fx-ignore</code></td>
-<td>Any element with this attribute on it or on an ancestor will not be processed for <code>fx-*</code> attributes</td>
-<td></td>
-</tr>
-</tbody>
-</table>
+| attribute | description | example |
+| --- | --- | --- |
+| `fx-action` | The URL to which an HTTP request will be issued, required | `fx-action='/demo'` |
+| `fx-method` | The HTTP Method that will be used for the request (case-insensitive), defaults to `GET` | `fx-method='DELETE'` |
+| `fx-target` | A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element | `fx-target='#a-div'` |
+| `fx-swap` | A string specifying how the content should be swapped into the DOM, can be one of `innerHTML`, `outerHTML`, `beforebegin`, `afterbegin`, `beforeend`, `afterend`, `none`, or any valid property on the element (e.g. `className` or `value`), defaults to `outerHTML` | `fx-swap='innerHTML'` |
+| `fx-trigger` | The event that will trigger a request, defaults to `submit` for `form` elements, `change` for `input`-like elements & `click` for all other elements | `fx-trigger='click'` |
+| `fx-ignore` | Any element with this attribute on it or on an ancestor will not be processed for `fx-*` attributes | |
 
 #### Modus Operandi
 
@@ -377,93 +338,24 @@ Because the `output` element is marked as `fx-ignore`, any `fx-action` attribute
 
 fixi fires the following events, broken into two categories:
 
-<table>
-<thead>
-<tr>
-  <th>category</th>
-  <th>event</th>
-  <th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td rowspan="3"><a href="#initialization-events">initialization</a></td>
-<td>
-<a href="#fxinit"><code>fx:init</code></a>
-</td>
-<td>
-triggered on elements that have a <code>fx-action</code> attribute and are about to be initialized by fixi
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxinited"><code>fx:inited</code></a>
-</td>
-<td>
-triggered on elements have been initialized by fixi (does <b>not</b> bubble)
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxprocess"><code>fx:process</code></a>
-</td>
-<td>
-fixi listens on the <code>document</code> object for this event and will process (that is, enable any fixi-powered 
-elements) within that element.
-</td>
-</tr>
-<tr>
-<td rowspan="6"><a href="#fetch-events">fetch</a></td>
-<td>
-<a href="#fxconfig"><code>fx:config</code></a>
-</td>
-<td>
-triggered on an element immediately when a request has been triggered, allowing users to configure the request
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxbefore"><code>fx:before</code></a>
-</td>
-<td>
-triggered on an element just before a <code>fetch()</code> request is made
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxafter"><code>fx:after</code></a>
-</td>
-<td>
-triggered on an element just after a <code>fetch()</code> request finishes normally but before content is swapped
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxerror"><code>fx:error</code></a>
-</td>
-<td>
-triggered on an element if something is thrown from a <code>fetch()</code>
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxfinally"><code>fx:finally</code></a>
-</td>
-<td>
-triggered on an element after a request no matter what
-</td>
-</tr>
-<tr>
-<td>
-<a href="#fxswapped"><code>fx:swapped</code></a>
-</td>
-<td>
-triggered after the swap and any associated 
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API">View Transition</a> has completed
-</td>
-</tr>
-</tbody>
-</table>
+[Initialization events](#initialization-events):
+
+| event | description |
+| --- | --- |
+| [`fx:init`](#fxinit) | triggered on elements that have a `fx-action` attribute and are about to be initialized by fixi |
+| [`fx:inited`](#fxinited) | triggered on elements have been initialized by fixi (does **not** bubble) |
+| [`fx:process`](#fxprocess) | fixi listens on the `document` object for this event and will process (that is, enable any fixi-powered elements) within that element. |
+
+[Fetch events](#fetch-events):
+
+| event | description |
+| --- | --- |
+| [`fx:config`](#fxconfig) | triggered on an element immediately when a request has been triggered, allowing users to configure the request |
+| [`fx:before`](#fxbefore) | triggered on an element just before a `fetch()` request is made |
+| [`fx:after`](#fxafter) | triggered on an element just after a `fetch()` request finishes normally but before content is swapped |
+| [`fx:error`](#fxerror) | triggered on an element if something is thrown from a `fetch()` |
+| [`fx:finally`](#fxfinally) | triggered on an element after a request no matter what |
+| [`fx:swapped`](#fxswapped) | triggered after the swap and any associated [View Transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) has completed |
 
 #### Initialization Events
 
@@ -577,32 +469,10 @@ The  `fx:swapped` event is triggered once the swap and any associated View Trans
 
 fixi adds two properties to elements in the DOM
 
-<table>
-<thead>
-<tr>
-  <th>property</th>
-  <th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="#document__fixi_mo"><code>document.__fixi_mo</code></a>
-</td>
-<td>
-The MutationObserver that fixi uses to watch for new content to process new fixi-powered elements.
-</td>
-</tr>
-<tr>
-<td>
-<a href="#elt__fixi"><code>elt.__fixi</code></a>
-</td>
-<td>
-The event handler created by fixi on fixi-powered elements 
-</td>
-</tr>
-</tbody>
-</table>
+| property | description |
+| --- | --- |
+| [`document.__fixi_mo`](#document__fixi_mo) | The MutationObserver that fixi uses to watch for new content to process new fixi-powered elements. |
+| [`elt.__fixi`](#elt__fixi) | The event handler created by fixi on fixi-powered elements |
 
 #### `document.__fixi_mo`
 
@@ -678,34 +548,11 @@ You can change a few of fixi's per-request defaults by assigning a global `fixiC
 <script src="fixi.js"></script>
 ```
 
-<table>
-<thead>
-<tr><th>key</th><th>effect</th></tr>
-</thead>
-<tbody>
-<tr>
-<td><code>swap</code></td>
-<td>
-Default value for <code>cfg.swap</code> when an element has no <code>fx-swap</code> attribute
-</td>
-</tr>
-<tr>
-<td><code>transition</code></td>
-<td>
-Replaces the default <code>document.startViewTransition</code> binding.  Set to <code>false</code>
-to disable view transitions entirely.  Set to a function with the same shape as
-<code>startViewTransition</code> to plug in a custom wrapper.
-</td>
-</tr>
-<tr>
-<td><code>headers</code></td>
-<td>
-Merged into the default <code>{"FX-Request": "true"}</code> headers; user-supplied keys win on
-collision.
-</td>
-</tr>
-</tbody>
-</table>
+| key | effect |
+| --- | --- |
+| `swap` | Default value for `cfg.swap` when an element has no `fx-swap` attribute |
+| `transition` | Replaces the default `document.startViewTransition` binding. Set to `false` to disable view transitions entirely. Set to a function with the same shape as `startViewTransition` to plug in a custom wrapper. |
+| `headers` | Merged into the default `{"FX-Request": "true"}` headers; user-supplied keys win on collision. |
 
 Note that any [`fx:config`](#fxconfig) listener can override these defaults by mutating `evt.detail.cfg`, so per-element behavior is unaffected.
 
