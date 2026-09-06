@@ -176,7 +176,7 @@ below.
 
 If an element is within a form element or has a `form` attribute, the values of that form will be included with the
 request.  Otherwise, if the element has a `name`, its `name` & `value` will be sent with the request.   You can add or 
-remove values using the `evt.detail.cfg.form` `FormData` object in the [`fx:config`](#fxconfig) event.
+remove values using the `evt.detail.cfg.body` `FormData` object in the [`fx:config`](#fxconfig) event.
 
 `GET` & `DELETE` requests will include values via query parameters, other request types will submit them as a form
 encoded body.
